@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: peptide-app
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: peptide-data
+      mountPath: /var/data
+      sizeGB: 1

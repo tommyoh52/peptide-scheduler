@@ -1,0 +1,38 @@
+# fly.toml — Fly.io config for peptide-app
+# Docs: https://fly.io/docs/reference/configuration/
+
+app = "peptide-app"        # Change this if "peptide-app" is already taken
+primary_region = "sea"     # Seattle — closest to Hawaii. Use `fly platform regions` for the full list.
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+  DATA_DIR = "/data"
+
+# Persistent volume for SQLite. Survives redeploys and restarts.
+[mounts]
+  source = "peptide_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false   # Keep it running — your reminder cron needs to stay alive.
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
